@@ -1,0 +1,150 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Poppins', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Custom Components */
+@layer components {
+    .hover-scale {
+        @apply transition-transform duration-300 ease-in-out hover:scale-105;
+    }
+    
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .gradient-overlay {
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+    }
+    
+    .card-hover {
+        @apply transition-all duration-300 ease-in-out;
+    }
+    
+    .card-hover:hover {
+        @apply -translate-y-2.5 shadow-2xl;
+    }
+    
+    .card-shine {
+        @apply relative overflow-hidden transition-transform duration-500;
+    }
+    
+    .card-shine::before {
+        content: '';
+        @apply absolute top-0 -left-full w-1/2 h-full;
+        background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: skewX(-25deg);
+        @apply transition-all duration-700 z-10;
+    }
+    
+    .card-shine:hover::before {
+        left: 125%;
+    }
+    
+    .btn-hover {
+        @apply relative overflow-hidden transition-all duration-300;
+    }
+    
+    .btn-hover::after {
+        content: '';
+        @apply absolute bottom-0 left-0 w-full h-full;
+        background-color: rgba(255, 255, 255, 0.2);
+        @apply scale-x-0 origin-right transition-transform duration-500;
+    }
+    
+    .btn-hover:hover::after {
+        @apply scale-x-100 origin-left;
+    }
+    
+    .image-hover {
+        @apply transition-all duration-500 overflow-hidden;
+    }
+    
+    .image-hover img {
+        @apply transition-all duration-500;
+    }
+    
+    .image-hover:hover img {
+        @apply scale-110 rotate-2;
+    }
+    
+    .bg-pattern {
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .text-gradient {
+        background: linear-gradient(to right, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .nav-link {
+        @apply relative;
+    }
+    
+    .nav-link::after {
+        content: '';
+        @apply absolute w-0 h-0.5 -bottom-0.5 left-0 bg-blue-600 transition-all duration-300;
+    }
+    
+    .nav-link:hover::after {
+        @apply w-full;
+    }
+    
+    /* Skeleton loading */
+    .skeleton {
+        @apply relative overflow-hidden;
+    }
+    
+    .skeleton::after {
+        content: "";
+        @apply absolute top-0 right-0 bottom-0 left-0 -translate-x-full;
+        background-image: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0.2) 20%,
+            rgba(255, 255, 255, 0.5) 60%,
+            rgba(255, 255, 255, 0)
+        );
+        animation: shimmer 2s infinite;
+    }
+    
+    .skeleton-text {
+        @apply h-4 mb-2 rounded;
+    }
+    
+    .skeleton-image {
+        @apply h-full w-full rounded-lg;
+    }
+}
+
+/* Custom Animations */
+@layer utilities {
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+}
+
+/* Swiper customization */
+.swiper-pagination-bullet-active {
+    background-color: #2563eb !important;
+}
