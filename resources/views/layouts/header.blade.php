@@ -106,7 +106,11 @@
                     @auth
                         <div class="relative group">
                             <button class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
-                                <i class="fas fa-user text-blue-500"></i>
+                                @if(Auth::user()->avatar)
+                                    <img src="{{ \App\Helpers\StorageHelper::getStorageUrl(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" class="w-8 h-8 rounded-full object-cover border border-blue-100" />
+                                @else
+                                    <i class="fas fa-user text-blue-500"></i>
+                                @endif
                                 <span>{{ Auth::user()->name }}</span>
                                 <i class="fas fa-chevron-down text-xs ml-1"></i>
                             </button>

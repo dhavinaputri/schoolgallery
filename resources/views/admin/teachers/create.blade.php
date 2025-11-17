@@ -24,7 +24,7 @@
         @csrf
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-6 bg-gray-50 border border-gray-200 rounded-lg p-6">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap <span class="text-red-500">*</span></label>
                     <input type="text" id="name" name="name" value="{{ old('name') }}" required class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500">

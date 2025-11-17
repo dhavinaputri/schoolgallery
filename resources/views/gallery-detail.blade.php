@@ -94,7 +94,7 @@
                     <div class="bg-white rounded-xl shadow p-4 sm:p-6 mb-6">
                         <div class="flex items-center space-x-3 mb-4">
                             @if(auth()->user()->avatar)
-                                <img src="{{ asset(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                                <img src="{{ \App\Helpers\StorageHelper::getStorageUrl(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                             @else
                                 <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
                                     {{ auth()->user()->name[0] }}
@@ -155,25 +155,32 @@
                         <h3 class="text-2xl font-bold text-gray-900">Galeri Lainnya</h3>
                         <a href="{{ route('gallery') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Lihat lainnya</a>
                     </div>
-                    <div class="overflow-x-auto scrollbar-thin scroll-smooth pb-2 -mb-2">
-                        <div class="flex gap-4 snap-x snap-mandatory min-w-max pr-4">
-                            @php
-                                $count = $relatedGalleries->count();
-                            @endphp
+                    <div class="overflow-x-auto scrollbar-thin" data-aos="fade-up">
+                        <div class="flex gap-4 snap-x snap-mandatory">
                             @foreach($relatedGalleries as $related)
-                                <a href="{{ route('gallery.detail', $related->id) }}" class="group block snap-start shrink-0 w-72">
-                                    <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
-                                        <div class="w-full" style="aspect-ratio: 16 / 9;">
-                                            <img src="{{ \App\Helpers\StorageHelper::getStorageUrl($related->image) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <a href="{{ route('gallery.detail', $related->id) }}" class="shrink-0 w-64 sm:w-72 md:w-80 snap-start bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 block">
+                                    <div class="relative">
+                                        @if($related->image)
+                                            <img src="{{ \App\Helpers\StorageHelper::getStorageUrl($related->image) }}" alt="{{ $related->title }}" class="w-full h-40 object-cover">
+                                        @else
+                                            <div class="w-full h-40 bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                                                <i class="fas fa-images text-white text-4xl"></i>
+                                            </div>
+                                        @endif
+                                        <div class="absolute top-2 right-2">
+                                            <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                                                {{ $related->created_at->format('d M Y') }}
+                                            </span>
                                         </div>
-                                        <div class="p-3">
-                                            <h4 class="text-gray-800 font-semibold text-sm line-clamp-2">{{ $related->title }}</h4>
-                                            <p class="text-gray-500 text-xs mt-1">{{ $related->created_at->format('d M Y') }}</p>
-                                        </div>
+                                    </div>
+                                    <div class="p-4">
+                                        <h4 class="text-base md:text-lg font-bold mb-2 text-gray-800 line-clamp-2">{{ $related->title }}</h4>
+                                        <span class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm mt-2">
+                                            Lihat galeri <i class="fas fa-arrow-right ml-1"></i>
+                                        </span>
                                     </div>
                                 </a>
                             @endforeach
-                            </div>
                         </div>
                     </div>
                 </div>

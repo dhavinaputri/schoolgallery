@@ -90,7 +90,7 @@
             <div class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                         <div class="relative">
                             @if($teacher->image)
-                                <img src="{{ \App\Helpers\StorageHelper::getStorageUrl($teacher->image) }}" alt="{{ $teacher->name }}" class="w-full h-48 object-cover">
+                                <img src="{{ \App\Helpers\StorageHelper::getStorageUrl($teacher->image) }}" alt="{{ $teacher->name }}" class="w-full h-48 object-cover object-top">
                             @else
                                 <div class="w-full h-48 bg-gray-100 flex items-center justify-center">
                                     <i class="fas fa-user text-5xl text-gray-300"></i>

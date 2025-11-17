@@ -28,6 +28,10 @@
                 @endif
                 
                 <div class="p-8">
+                    @php
+                        $shareUrl = urlencode(request()->fullUrl());
+                        $shareText = urlencode($news->title);
+                    @endphp
                     @if($news->newsCategory)
                         <div class="mb-4">
                             <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-semibold">
@@ -39,21 +43,21 @@
                         <span class="inline-flex items-center"><i class="far fa-calendar-alt mr-2 text-gray-400"></i>{{ $news->created_at->format('d M Y') }}</span>
                         <span class="inline-flex items-center"><i class="far fa-user mr-2 text-gray-400"></i>Admin</span>
                     </div>
-                    <div class="prose prose-lg max-w-none">
+                    <div class="prose prose-lg max-w-3xl mx-auto leading-relaxed text-gray-800 news-content">
                         {!! $news->content !!}
                     </div>
                     <div class="border-t mt-8 pt-6 flex items-center gap-3">
                         <span class="text-gray-700 font-medium">Bagikan:</span>
-                        <a href="#" class="bg-blue-600 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener" class="bg-blue-600 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="bg-blue-400 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
+                        <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}&text={{ $shareText }}" target="_blank" rel="noopener" class="bg-blue-400 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="bg-green-600 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors">
+                        <a href="https://wa.me/?text={{ $shareText }}%20{{ $shareUrl }}" target="_blank" rel="noopener" class="bg-green-600 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors">
                             <i class="fab fa-whatsapp"></i>
                         </a>
-                        <a href="#" class="bg-blue-800 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-900 transition-colors">
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $shareUrl }}" target="_blank" rel="noopener" class="bg-blue-800 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-900 transition-colors">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
                     </div>
@@ -70,7 +74,7 @@
             <div class="bg-gray-50 rounded-xl p-4 mb-6">
                 <div class="flex items-center space-x-3 mb-4">
                     @if(auth()->user()->avatar)
-                        <img src="{{ asset(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover" />
+                        <img src="{{ \App\Helpers\StorageHelper::getStorageUrl(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover" />
                     @else
                         <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
                             {{ substr(auth()->user()->name, 0, 1) }}
@@ -141,7 +145,7 @@
             <div class="overflow-x-auto scrollbar-thin" data-aos="fade-up">
                 <div class="flex gap-4 snap-x snap-mandatory">
                     @forelse($relatedNews as $item)
-                        <div class="shrink-0 w-64 sm:w-72 md:w-80 snap-start bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                        <a href="{{ route('news.detail', $item->slug) }}" class="shrink-0 w-64 sm:w-72 md:w-80 snap-start bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 block">
                             <div class="relative">
                                 @if($item->image)
                                     <img src="{{ \App\Helpers\StorageHelper::getStorageUrl($item->image) }}" alt="{{ $item->title }}" class="w-full h-40 object-cover">
@@ -156,11 +160,11 @@
                             </div>
                             <div class="p-4">
                                 <h3 class="text-base md:text-lg font-bold mb-2 text-gray-800 line-clamp-2">{{ $item->title }}</h3>
-                                <a href="{{ route('news.detail', $item->slug) }}" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm mt-2">
+                                <span class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm mt-2">
                                     Baca selengkapnya <i class="fas fa-arrow-right ml-1"></i>
-                                </a>
+                                </span>
                             </div>
-                        </div>
+                        </a>
                     @empty
                         <div class="text-center py-8 w-full">
                             <p class="text-gray-600">Tidak ada berita terkait.</p>
@@ -400,4 +404,13 @@ function updateRelativeTimes() {
 
 setInterval(updateRelativeTimes, 60000);
 </script>
+@push('styles')
+<style>
+    .news-content p {
+        text-align: justify;
+        text-indent: 1.5em;
+        margin-bottom: 1em;
+    }
+</style>
+@endpush
 @endpush

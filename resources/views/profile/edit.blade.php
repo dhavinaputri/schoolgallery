@@ -182,7 +182,7 @@
     .btn-disabled { opacity: 0.6; pointer-events: none; }
     .toast { position: fixed; top: 16px; right: 16px; z-index: 9999; }
     .toast > div { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); }
-}</style>
+</style>
 @endpush
 
 @push('scripts')

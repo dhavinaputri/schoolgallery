@@ -72,7 +72,7 @@
                 <div class="grid grid-cols-1 gap-8">
                     <!-- Main Content -->
                     <div class="space-y-8">
-                        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                             @foreach($news as $item)
                                 <a href="{{ route('news.detail', $item->slug) }}" class="group block h-full">
                                     <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 h-full flex flex-col border border-gray-100">

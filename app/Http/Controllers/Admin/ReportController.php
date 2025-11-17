@@ -53,11 +53,16 @@ class ReportController extends Controller
             'format' => 'required|in:pdf,excel'
         ]);
 
+        // Raw dates for display
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
+        // Full-day range for queries
+        $startDateTime = \Carbon\Carbon::parse($startDate)->startOfDay();
+        $endDateTime = \Carbon\Carbon::parse($endDate)->endOfDay();
+
         // Get visitor statistics
-        $visitorStats = $this->getVisitorStatistics($startDate, $endDate);
+        $visitorStats = $this->getVisitorStatistics($startDateTime, $endDateTime);
         
         // Get school profile for branding
         $schoolProfile = \App\Models\SchoolProfile::first();
@@ -82,11 +87,16 @@ class ReportController extends Controller
             'format' => 'required|in:pdf,excel'
         ]);
 
+        // Raw dates for display in laporan
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
+        // Gunakan rentang satu hari penuh untuk query (00:00 s/d 23:59:59)
+        $startDateTime = \Carbon\Carbon::parse($startDate)->startOfDay();
+        $endDateTime = \Carbon\Carbon::parse($endDate)->endOfDay();
+
         // Get content statistics
-        $contentStats = $this->getContentStatistics($startDate, $endDate);
+        $contentStats = $this->getContentStatistics($startDateTime, $endDateTime);
         $schoolProfile = \App\Models\SchoolProfile::first();
 
         if ($request->format === 'pdf') {
@@ -109,11 +119,16 @@ class ReportController extends Controller
             'format' => 'required|in:pdf,excel'
         ]);
 
+        // Raw dates for display
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
+        // Full-day range for queries
+        $startDateTime = \Carbon\Carbon::parse($startDate)->startOfDay();
+        $endDateTime = \Carbon\Carbon::parse($endDate)->endOfDay();
+
         // Get admin activity statistics
-        $activityStats = $this->getAdminActivityStatistics($startDate, $endDate);
+        $activityStats = $this->getAdminActivityStatistics($startDateTime, $endDateTime);
         $schoolProfile = \App\Models\SchoolProfile::first();
 
         if ($request->format === 'pdf') {
