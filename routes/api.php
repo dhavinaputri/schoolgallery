@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\SchoolProfileController;
 use App\Http\Controllers\Api\TeacherController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,9 @@ Route::prefix('v1')->group(function () {
     // Teachers - Public routes
     Route::get('/teachers', [TeacherController::class, 'index']);
     Route::get('/teachers/{teacher}', [TeacherController::class, 'show']);
+
+    // Chatbot - public API endpoint that proxies to Gemini via backend
+    Route::post('/chatbot/ask', [ChatbotController::class, 'ask']);
     
     // Protected routes (admin only)
     Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
