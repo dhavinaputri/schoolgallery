@@ -164,7 +164,7 @@ class InteractionController extends Controller
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
-                'avatar_url' => $commentUser && $commentUser->avatar ? asset('storage/'.$commentUser->avatar) : null,
+                'avatar_url' => $commentUser && $commentUser->avatar_url ? $commentUser->avatar_url : null,
                 'replies' => $comment->replies->map(function ($reply) {
                     $replyUser = $reply->email ? User::where('email', $reply->email)->first() : null;
                     return [
@@ -174,7 +174,7 @@ class InteractionController extends Controller
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
                         'created_at_iso' => $reply->created_at->toIso8601String(),
-                        'avatar_url' => $replyUser && $replyUser->avatar ? asset('storage/'.$replyUser->avatar) : null,
+                        'avatar_url' => $replyUser && $replyUser->avatar_url ? $replyUser->avatar_url : null,
                     ];
                 })
             ];
