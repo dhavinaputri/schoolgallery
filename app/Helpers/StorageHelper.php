@@ -11,12 +11,14 @@ class StorageHelper
      */
     public static function getStoragePath($path = '')
     {
+        // NOTE: This helper is now mainly used for legacy storage paths.
+        // For new uploads we prefer public/images via storeFile().
         // Check if we're on Railway
         if (self::isRailwayEnvironment()) {
             $basePath = env('FILESYSTEM_ROOT', '/app/storage/app/public');
             return $path ? $basePath . '/' . ltrim($path, '/') : $basePath;
         }
-        
+
         // Local environment - use public_path
         return public_path('storage/' . ltrim($path, '/'));
     }
@@ -81,16 +83,18 @@ class StorageHelper
         $fileName = uniqid() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
         
         if (self::isRailwayEnvironment()) {
-            // Railway environment - store directly to mounted volume
-            $targetPath = self::getStoragePath($directory);
-            
+            // Railway environment - store directly under public/images
+            // so files are served as static assets without /storage
+            $targetPath = self::getPublicPath('images/' . trim($directory, '/'));
+
             // Ensure directory exists
             if (!file_exists($targetPath)) {
                 mkdir($targetPath, 0755, true);
             }
-            
+
             $file->move($targetPath, $fileName);
-            return $directory . '/' . $fileName;
+            // Return relative path under images (e.g. submissions/uuid/file.jpg)
+            return trim($directory, '/') . '/' . $fileName;
         } else {
             // Local environment - store into public/images using the public_images disk
             // Ensure directory exists and put the file
@@ -112,8 +116,8 @@ class StorageHelper
         }
 
         if (self::isRailwayEnvironment()) {
-            // Railway environment
-            $fullPath = self::getStoragePath($path);
+            // Railway environment - delete from public/images
+            $fullPath = self::getPublicPath('images/' . ltrim($path, '/'));
             if (file_exists($fullPath)) {
                 return unlink($fullPath);
             }
@@ -138,7 +142,8 @@ class StorageHelper
         }
 
         if (self::isRailwayEnvironment()) {
-            return file_exists(self::getStoragePath($path));
+            // Railway: check in public/images
+            return file_exists(self::getPublicPath('images/' . ltrim($path, '/')));
         } else {
             return Storage::disk('public')->exists($path);
         }

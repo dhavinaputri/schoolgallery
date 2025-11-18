@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\StorageHelper;
 use App\Notifications\CustomResetPassword;
 use App\Notifications\CustomVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -55,9 +56,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAvatarUrlAttribute(): ?string
     {
         if (!empty($this->avatar)) {
-            // Ensure forward slashes for Windows paths stored in DB
+            // Normalize path and build URL via StorageHelper so we can
+            // serve from public images (e.g. /images/...) in production
             $path = str_replace('\\', '/', $this->avatar);
-            return asset('storage/' . ltrim($path, '/'));
+            return StorageHelper::getStorageUrl($path);
         }
         return null;
     }
