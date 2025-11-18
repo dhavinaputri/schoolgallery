@@ -83,8 +83,8 @@ class StorageHelper
         $fileName = uniqid() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
         
         if (self::isRailwayEnvironment()) {
-            // Railway environment - store directly under public/images
-            // so files are served as static assets without /storage
+            // Railway/production: store directly under public/images
+            // so files are served as static assets via /images/{path}
             $targetPath = self::getPublicPath('images/' . trim($directory, '/'));
 
             // Ensure directory exists
@@ -93,7 +93,8 @@ class StorageHelper
             }
 
             $file->move($targetPath, $fileName);
-            // Return relative path under images (e.g. submissions/uuid/file.jpg)
+            // Return relative path (e.g. submissions/uuid/file.jpg)
+            // URL will be built via getStorageUrl() -> APP_URL/images/{path}
             return trim($directory, '/') . '/' . $fileName;
         } else {
             // Local environment - store into public/images using the public_images disk
@@ -116,7 +117,7 @@ class StorageHelper
         }
 
         if (self::isRailwayEnvironment()) {
-            // Railway environment - delete from public/images
+            // Railway/production: delete from public/images
             $fullPath = self::getPublicPath('images/' . ltrim($path, '/'));
             if (file_exists($fullPath)) {
                 return unlink($fullPath);
@@ -142,7 +143,7 @@ class StorageHelper
         }
 
         if (self::isRailwayEnvironment()) {
-            // Railway: check in public/images
+            // Railway/production: check in public/images
             return file_exists(self::getPublicPath('images/' . ltrim($path, '/')));
         } else {
             return Storage::disk('public')->exists($path);
