@@ -120,7 +120,7 @@ class GallerySubmissionController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.gallery-submissions.index', ['status' => 'pending'])
+        return redirect()->route('admin.gallery-submissions.index', ['status' => 'approved'])
             ->with('success', 'Pengajuan disetujui dan dipublikasikan ke galeri.');
     }
 
