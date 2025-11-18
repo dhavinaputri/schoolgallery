@@ -198,11 +198,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('galleries/{gallery}/remove-image', [GalleryController::class, 'removeImage'])->name('galleries.remove-image');
 
         // Gallery Submissions (User uploads) Management
-        Route::get('gallery-submissions', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'index'])->name('gallery-submissions.index');
-        Route::get('gallery-submissions/{submission}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'show'])->name('gallery-submissions.show');
-        Route::post('gallery-submissions/{submission}/approve', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'approve'])->name('gallery-submissions.approve');
-        Route::post('gallery-submissions/{submission}/reject', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'reject'])->name('gallery-submissions.reject');
-        Route::post('gallery-submissions/{submission}/publish/{image}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'publishImage'])->name('gallery-submissions.publish');
+        Route::get('/gallery-submissions', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'index'])->name('gallery-submissions.index');
+        Route::get('/gallery-submissions/{submission}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'show'])->name('gallery-submissions.show');
+        // Allow both GET and POST for approve to avoid 404s due to method issues in some environments
+        Route::match(['POST'], '/gallery-submissions/{submission}/approve', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'approve'])->name('gallery-submissions.approve');
+        Route::post('/gallery-submissions/{submission}/reject', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'reject'])->name('gallery-submissions.reject');
+        Route::post('/gallery-submissions/{submission}/publish/{image}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'publishImage'])->name('gallery-submissions.publish');
 
         // Gallery Comments moderation
         Route::delete('galleries/comments/{comment}', function(App\Models\GalleryComment $comment){
