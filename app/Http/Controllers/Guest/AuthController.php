@@ -88,8 +88,16 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Kirim email verifikasi
-        $user->sendEmailVerificationNotification();
+        // Kirim email verifikasi, jangan sampai error mailer membuat 500
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send verification email on register', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         // Redirect ke halaman notice tanpa auto-login
         return redirect()->route('guest.verification.notice')
@@ -212,7 +220,16 @@ class AuthController extends Controller
             return back()->with('info', 'Email Anda sudah diverifikasi. Silakan login.');
         }
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            \Log::error('Failed to resend verification email', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Gagal mengirim ulang email verifikasi. Silakan coba beberapa saat lagi.');
+        }
 
         return back()->with('success', 'Link verifikasi telah dikirim ulang ke email Anda!');
     }
