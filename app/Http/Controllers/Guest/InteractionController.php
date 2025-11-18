@@ -464,6 +464,15 @@ class InteractionController extends Controller
         
         $comments = $news->comments()->with('replies')->get()->map(function ($comment) {
             $commentUser = User::where('name', $comment->name)->first();
+
+            // Determine avatar URL for news comments: prefer user avatar_url, then gravatar based on email if available
+            $avatarUrl = null;
+            if ($commentUser && !empty($commentUser->avatar_url)) {
+                $avatarUrl = $commentUser->avatar_url;
+            } elseif (!empty($commentUser?->email)) {
+                $email = strtolower(trim($commentUser->email));
+                $avatarUrl = 'https://www.gravatar.com/avatar/' . md5($email) . '?s=80&d=mp';
+            }
             return [
                 'id' => $comment->id,
                 'name' => $comment->name,
@@ -471,9 +480,17 @@ class InteractionController extends Controller
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
-                'avatar_url' => $commentUser && $commentUser->avatar ? asset('storage/'.$commentUser->avatar) : null,
+                'avatar_url' => $avatarUrl,
                 'replies' => $comment->replies->map(function ($reply) {
                     $replyUser = User::where('name', $reply->name)->first();
+
+                    $replyAvatarUrl = null;
+                    if ($replyUser && !empty($replyUser->avatar_url)) {
+                        $replyAvatarUrl = $replyUser->avatar_url;
+                    } elseif (!empty($replyUser?->email)) {
+                        $email = strtolower(trim($replyUser->email));
+                        $replyAvatarUrl = 'https://www.gravatar.com/avatar/' . md5($email) . '?s=80&d=mp';
+                    }
                     return [
                         'id' => $reply->id,
                         'name' => $reply->name,
@@ -481,7 +498,7 @@ class InteractionController extends Controller
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
                         'created_at_iso' => $reply->created_at->toIso8601String(),
-                        'avatar_url' => $replyUser && $replyUser->avatar ? asset('storage/'.$replyUser->avatar) : null,
+                        'avatar_url' => $replyAvatarUrl,
                     ];
                 })
             ];

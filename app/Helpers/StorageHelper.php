@@ -82,29 +82,11 @@ class StorageHelper
     {
         $fileName = uniqid() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
         
-        if (self::isRailwayEnvironment()) {
-            // Railway/production: store directly under public/images
-            // so files are served as static assets via /images/{path}
-            $targetPath = self::getPublicPath('images/' . trim($directory, '/'));
-
-            // Ensure directory exists
-            if (!file_exists($targetPath)) {
-                mkdir($targetPath, 0755, true);
-            }
-
-            $file->move($targetPath, $fileName);
-            // Return relative path (e.g. submissions/uuid/file.jpg)
-            // URL will be built via getStorageUrl() -> APP_URL/images/{path}
-            return trim($directory, '/') . '/' . $fileName;
-        } else {
-            // Local environment - store into public/images using the public_images disk
-            // Ensure directory exists and put the file
-            $storedPath = $file->storeAs($directory, $fileName, 'public_images');
-            // Normalize to forward slashes for URL building and DB storage consistency
-            $storedPath = str_replace('\\', '/', $storedPath);
-            // Return relative path (e.g., galleries/xxx.jpg); URL builder will map to /images or /storage
-            return $storedPath;
-        }
+        // Unified behavior: always store via Laravel public disk (storage/app/public)
+        // This works both locally and on Railway when FILESYSTEM_ROOT/volume is configured.
+        $storedPath = $file->storeAs($directory, $fileName, 'public');
+        $storedPath = str_replace('\\', '/', $storedPath);
+        return $storedPath;
     }
 
     /**
@@ -116,18 +98,12 @@ class StorageHelper
             return false;
         }
 
-        if (self::isRailwayEnvironment()) {
-            // Railway/production: delete from public/images
-            $fullPath = self::getPublicPath('images/' . ltrim($path, '/'));
-            if (file_exists($fullPath)) {
-                return unlink($fullPath);
-            }
-        } else {
-            // Local environment: attempt delete in both disks
-            if (Storage::disk('public_images')->exists($path)) {
-                return Storage::disk('public_images')->delete($path);
-            }
+        // Always delete from public disk; keep public_images fallback for legacy local files
+        if (Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->delete($path);
+        }
+        if (Storage::disk('public_images')->exists($path)) {
+            return Storage::disk('public_images')->delete($path);
         }
         
         return false;
@@ -142,12 +118,7 @@ class StorageHelper
             return false;
         }
 
-        if (self::isRailwayEnvironment()) {
-            // Railway/production: check in public/images
-            return file_exists(self::getPublicPath('images/' . ltrim($path, '/')));
-        } else {
-            return Storage::disk('public')->exists($path);
-        }
+        return Storage::disk('public')->exists($path);
     }
 
     /**
