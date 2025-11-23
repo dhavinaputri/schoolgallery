@@ -220,11 +220,18 @@
                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                         <i class="far fa-eye mr-1"></i> Lihat
                                     </a>
-                                    <a href="{{ route('gallery.download', $gallery->id) }}" 
-                                       class="text-gray-600 hover:text-gray-800 text-sm font-medium" 
-                                       title="Download Gambar">
-                                        <i class="fas fa-download mr-1"></i> Unduh
-                                    </a>
+                                    @if($gallery->image)
+                                        <a href="{{ \App\Helpers\StorageHelper::getStorageUrl($gallery->image) }}" 
+                                           class="text-gray-600 hover:text-gray-800 text-sm font-medium" 
+                                           title="Download Gambar"
+                                           download>
+                                            <i class="fas fa-download mr-1"></i> Unduh
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400 text-sm font-medium" title="Gambar tidak tersedia">
+                                            <i class="fas fa-download mr-1"></i> Unduh
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="mt-3 hidden sm:flex items-center justify-between text-sm text-gray-600">
                                     <div class="flex items-center gap-4">
@@ -365,11 +372,11 @@
     // Like functionality
     async function toggleLike(galleryId) {
         try {
-            const likeBtn = document.querySelector(`.like-btn[data-gallery-id="${galleryId}"]`);
+            const likeBtn = document.querySelector(.like-btn[data-gallery-id="${galleryId}"]);
             if (!likeBtn) return;
             likeBtn.disabled = true;
 
-            const response = await fetch(`/gallery/${galleryId}/like`, {
+            const response = await fetch(/gallery/${galleryId}/like, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -389,14 +396,16 @@
                 const likeIcon = likeBtn.querySelector('i');
                 const likeCount = likeBtn.querySelector('.like-count');
                 
-                if (data.liked) {
-                    likeIcon.className = 'fas fa-heart mr-1';
-                    likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
-                    likeBtn.dataset.liked = 'true';
-                } else {
-                    likeIcon.className = 'far fa-heart mr-1';
-                    likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
-                    likeBtn.dataset.liked = 'false';
+                if (likeIcon) {
+                    if (data.liked) {
+                        likeIcon.className = 'fas fa-heart mr-1';
+                        likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
+                        likeBtn.dataset.liked = 'true';
+                    } else {
+                        likeIcon.className = 'far fa-heart mr-1';
+                        likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
+                        likeBtn.dataset.liked = 'false';
+                    }
                 }
                 
                 if (likeCount && typeof data.like_count !== 'undefined') {
@@ -407,7 +416,7 @@
             console.error('Error toggling like:', error);
             showNotification('Terjadi kesalahan saat like/unlike', 'error');
         } finally {
-            const likeBtn = document.querySelector(`.like-btn[data-gallery-id="${galleryId}"]`);
+            const likeBtn = document.querySelector(.like-btn[data-gallery-id="${galleryId}"]);
             if (likeBtn) likeBtn.disabled = false;
         }
     }
@@ -415,11 +424,11 @@
     // Favorite functionality for list
     async function toggleFavoriteList(galleryId) {
         try {
-            const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${galleryId}"]`);
+            const favBtn = document.querySelector(.fav-btn[data-gallery-id="${galleryId}"]);
             if (!favBtn) return;
             favBtn.disabled = true;
 
-            const response = await fetch(`/gallery/${galleryId}/favorite`, {
+            const response = await fetch(/gallery/${galleryId}/favorite, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -431,14 +440,16 @@
             if (data && data.success) {
                 const icon = favBtn.querySelector('i');
                 const countEl = favBtn.querySelector('.fav-count');
-                if (data.favorited) {
-                    favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
-                    icon.className = 'fas fa-bookmark mr-1';
-                    favBtn.dataset.favorited = 'true';
-                } else {
-                    favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
-                    icon.className = 'far fa-bookmark mr-1';
-                    favBtn.dataset.favorited = 'false';
+                if (icon) {
+                    if (data.favorited) {
+                        favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
+                        icon.className = 'fas fa-bookmark mr-1';
+                        favBtn.dataset.favorited = 'true';
+                    } else {
+                        favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
+                        icon.className = 'far fa-bookmark mr-1';
+                        favBtn.dataset.favorited = 'false';
+                    }
                 }
                 if (countEl && typeof data.favorite_count !== 'undefined') {
                     countEl.textContent = data.favorite_count;
@@ -447,7 +458,7 @@
         } catch (e) {
             console.error('Error toggling favorite:', e);
         } finally {
-            const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${galleryId}"]`);
+            const favBtn = document.querySelector(.fav-btn[data-gallery-id="${galleryId}"]);
             if (favBtn) favBtn.disabled = false;
         }
     }
@@ -468,46 +479,50 @@
         ids.forEach(async (id) => {
             // Favorite status/count
             try {
-                const resFav = await fetch(`/gallery/${id}/favorite-status`);
+                const resFav = await fetch(/gallery/${id}/favorite-status);
                 const dataFav = await resFav.json();
-                const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${id}"]`);
-                const favCountEl = favBtn ? favBtn.querySelector('.fav-count') : document.querySelector(`.fav-count[data-gallery-id="${id}"]`);
+                const favBtn = document.querySelector(.fav-btn[data-gallery-id="${id}"]);
+                const favCountEl = favBtn ? favBtn.querySelector('.fav-count') : document.querySelector(.fav-count[data-gallery-id="${id}"]);
                 if (favCountEl && typeof dataFav.favorite_count !== 'undefined') {
                     favCountEl.textContent = dataFav.favorite_count;
                 }
                 if (favBtn && dataFav.success && typeof dataFav.favorited !== 'undefined') {
                     const icon = favBtn.querySelector('i');
-                    if (dataFav.favorited) {
-                        favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
-                        icon.className = 'fas fa-bookmark mr-1';
-                        favBtn.dataset.favorited = 'true';
-                    } else {
-                        favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
-                        icon.className = 'far fa-bookmark mr-1';
-                        favBtn.dataset.favorited = 'false';
+                    if (icon) {
+                        if (dataFav.favorited) {
+                            favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
+                            icon.className = 'fas fa-bookmark mr-1';
+                            favBtn.dataset.favorited = 'true';
+                        } else {
+                            favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
+                            icon.className = 'far fa-bookmark mr-1';
+                            favBtn.dataset.favorited = 'false';
+                        }
                     }
                 }
             } catch (e) {}
 
             // Like status/count
             try {
-                const resLike = await fetch(`/gallery/${id}/like-status`);
+                const resLike = await fetch(/gallery/${id}/like-status);
                 const dataLike = await resLike.json();
-                const likeBtn = document.querySelector(`.like-btn[data-gallery-id="${id}"]`);
-                const likeCountEl = likeBtn ? likeBtn.querySelector('.like-count') : document.querySelector(`.like-count[data-gallery-id="${id}"]`);
+                const likeBtn = document.querySelector(.like-btn[data-gallery-id="${id}"]);
+                const likeCountEl = likeBtn ? likeBtn.querySelector('.like-count') : document.querySelector(.like-count[data-gallery-id="${id}"]);
                 if (likeCountEl && typeof dataLike.like_count !== 'undefined') {
                     likeCountEl.textContent = dataLike.like_count;
                 }
                 if (likeBtn && dataLike.success && typeof dataLike.liked !== 'undefined') {
                     const icon = likeBtn.querySelector('i');
-                    if (dataLike.liked) {
-                        likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
-                        icon.className = 'fas fa-heart mr-1';
-                        likeBtn.dataset.liked = 'true';
-                    } else {
-                        likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
-                        icon.className = 'far fa-heart mr-1';
-                        likeBtn.dataset.liked = 'false';
+                    if (icon) {
+                        if (dataLike.liked) {
+                            likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
+                            icon.className = 'fas fa-heart mr-1';
+                            likeBtn.dataset.liked = 'true';
+                        } else {
+                            likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
+                            icon.className = 'far fa-heart mr-1';
+                            likeBtn.dataset.liked = 'false';
+                        }
                     }
                 }
             } catch (e) {}
