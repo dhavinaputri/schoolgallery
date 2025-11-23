@@ -12,8 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Prune expired events daily at 01:00
-        $schedule->command('events:prune-expired')->dailyAt('01:00');
+        
     }
 
     /**

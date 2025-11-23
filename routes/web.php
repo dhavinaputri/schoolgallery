@@ -5,8 +5,6 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SchoolProfileController;
-use App\Http\Controllers\Admin\EventsController;
-use App\Http\Controllers\EventController as PublicEventController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TeacherController;
@@ -21,7 +19,9 @@ use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\SitemapController;
 
-// Storage file serving route (must be before other routes)
+// Storage file serving route (must be before other routes) 
+//Fungsi ini untuk: Menampilkan file dari folder storage/app/public ke browser. 
+//Biasanya gambar yang di-upload user/ admin.
 Route::get('/storage/{path}', function ($path) {
     // Determine the actual file location
     $isProduction = app()->environment('production') || 
@@ -47,7 +47,7 @@ Route::get('/storage/{path}', function ($path) {
     return response()->file($fullPath);
 })->where('path', '.*')->name('storage.file');
 
-// Public Routes (tracked visits)
+// Public Routes (tracked visits) kunjungan user
 Route::middleware('track.visits')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
@@ -61,14 +61,12 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
     Route::get('/news', [HomeController::class, 'news'])->name('news');
     Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
-    Route::get('/events', [PublicEventController::class, 'index'])->name('events.index'); // Tambahkan route ini
-    Route::get('/events/{slug}', [PublicEventController::class, 'show'])->name('events.show');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/teachers', [HomeController::class, 'teachers'])->name('teachers');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });
 
-// Guest Interaction Routes (no login required)
+// Guest Interaction Routes (no login required) harus login jika melakukan interaksi user
 Route::middleware('track.visits')->group(function () {
     // Gallery interactions - comments can be viewed by everyone
     Route::get('/gallery/{id}/comments', [InteractionController::class, 'getComments'])->name('gallery.comments');
@@ -216,9 +214,7 @@ Route::prefix('manage-eduspot')->name('admin.')->group(function () {
         Route::patch('news/{news}/toggle-publish', [NewsController::class, 'togglePublish'])->name('news.toggle-publish');
         Route::delete('news/{news}/remove-image', [NewsController::class, 'removeImage'])->name('news.remove-image');
 
-        // Events Management
-        Route::resource('events', EventsController::class)->except(['show']);
-        Route::patch('events/{event}/toggle-publish', [EventsController::class, 'togglePublish'])->name('events.toggle-publish');
+        
 
         // Comments Management
         Route::get('comments', [\App\Http\Controllers\Admin\CommentsController::class, 'index'])->name('comments.index');
