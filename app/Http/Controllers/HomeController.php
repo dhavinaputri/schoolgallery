@@ -289,7 +289,7 @@ class HomeController extends Controller
             $facilities = Gallery::where('kategori_id', $fasilitasKategori->id)
                 ->published()
                 ->latest()
-                ->take(3)
+                ->take(4)
                 ->get();
         }
         

@@ -136,7 +136,10 @@
     <!-- Header -->
     <div class="header">
         <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:8px;">
-            <img src="{{ public_path('images/2.png') }}" alt="SpotEdu" style="height:40px;">
+            @php $__logoPath = public_path('images/2.png'); @endphp
+            @if(file_exists($__logoPath))
+                <img src="{{ $__logoPath }}" alt="SpotEdu" style="height:40px;">
+            @endif
             <div class="school-name">SpotEdu</div>
         </div>
         <div class="report-title">Laporan Statistik Konten</div>
